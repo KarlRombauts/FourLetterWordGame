@@ -6,16 +6,27 @@ import guru.nidi.graphviz.model.MutableNode;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import static guru.nidi.graphviz.model.Factory.graph;
-import static guru.nidi.graphviz.model.Factory.mutNode;
+import static guru.nidi.graphviz.model.Factory.*;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        List<MutableNode> nodes = getNodes(200);
 
+
+        // Create Graph
+        Graph g = graph("example2").directed().with(nodes);
+
+        // Export Graph as PNG
+        Graphviz.fromGraph(g).totalMemory(1000000000).width(3000).render(Format.PNG).toFile(new File("example/ex2.png"));
+    }
+
+    private static List<MutableNode> getNodes(int number) {
         // Get 50 words from dictionary
-        String[] words = new String[50];
+        String[] words = new String[number];
         System.arraycopy(Words.fourLetterWords, 0, words, 0, words.length);
 
         // Create Nodes
@@ -32,11 +43,7 @@ public class Main {
                 node1.addLink(node2);
             }
         }
-
-        // Create Graph
-        Graph g = graph("example2").directed().with(nodes);
-
-        // Export Graph as PNG
-        Graphviz.fromGraph(g).totalMemory(1000000000).width(3000).render(Format.PNG).toFile(new File("example/ex1.png"));
+        return nodes;
     }
+
 }
