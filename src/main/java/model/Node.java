@@ -1,5 +1,6 @@
+package model;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Node {
@@ -20,5 +21,9 @@ public class Node {
 
     public List<Node> getLinks() {
         return links;
+    }
+
+    public boolean hasLinkWith(Node node) {
+        return links.contains(node);
     }
 }

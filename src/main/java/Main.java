@@ -2,13 +2,12 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Graph;
 import guru.nidi.graphviz.model.MutableNode;
+import model.Words;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static guru.nidi.graphviz.model.Factory.*;
 
@@ -43,6 +42,7 @@ public class Main {
                 node1.addLink(node2);
             }
         }
+
         return nodes;
     }
 

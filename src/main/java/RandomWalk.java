@@ -1,3 +1,5 @@
+import model.Node;
+
 import java.util.*;
 
 public class RandomWalk {

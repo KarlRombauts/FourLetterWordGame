@@ -1,3 +1,6 @@
+import model.Node;
+import model.Words;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +13,9 @@ public class Agent {
         RandomWalk randomWalk = new RandomWalk();
 
         Node currentNode = nodes.get(nodes.size() - 10);
-        System.out.println("Current Node: " + currentNode.getName());
+        System.out.println("Current model.Node: " + currentNode.getName());
         for(Node node: currentNode.getLinks()) {
-            System.out.println(node.getName() + " " + randomWalk.calculateWinLoseRatio(nodes.get(45), 10000));
+            System.out.println(node.getName() + " " + randomWalk.calculateWinLoseRatio(nodes.get(45), 5000));
         }
     }
 
