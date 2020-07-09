@@ -5,18 +5,31 @@ import model.Words;
 
 import java.util.*;
 
+enum SearchState {
+    EXPLORING,
+    BACKTRACKING,
+}
+
 public class StateTreeFactory {
     private Node startNode;
     private int depth;
     private TreeNode currentTreeNode;
     private Node currentGraphNode;
+    private Set<Node> previouslyVisitedNodes = new HashSet<>();
     private Map<Node, Set<Node>> exploredConnectionsMap = new HashMap<>();
     private Stack<Node> currentPath = new Stack<>();
     private Node nextGraphNode;
+    private SearchState searchState;
+    private List<TreeNode> foundLeafNodes = new ArrayList<>();
 
-    public StateTreeFactory(Node startNode, int depth) {
+
+
+    public StateTreeFactory(Node startNode, Set<Node> previouslyVisitedNodes, int depth) {
         this.startNode = startNode;
         this.depth = depth;
+        this.previouslyVisitedNodes = previouslyVisitedNodes;
+
+        searchState = SearchState.EXPLORING;
         visitNode(startNode);
     }
 
@@ -40,13 +53,13 @@ public class StateTreeFactory {
     private Node nextUnexploredConnection(Node node) {
         Set<Node> exploredConnections = exploredConnectionsMap.get(node);
         for (Node link : node.getLinks()) {
-            if (!exploredConnections.contains(link) && !currentPath.contains(link))
+            if (!exploredConnections.contains(link) && !currentPath.contains(link) && !previouslyVisitedNodes.contains(link))
                 return link;
         }
         return null;
     }
 
-    public TreeNode createStateTree() {
+    public List<TreeNode> createStateTree() {
         int count = 0;
         nextGraphNode = nextUnexploredConnection(currentGraphNode);
         while (true) {
@@ -56,14 +69,19 @@ public class StateTreeFactory {
                 break;
             }
             if (shouldBackTrack()) {
+                if (searchState == SearchState.EXPLORING) {
+                    foundLeafNodes.add(currentTreeNode);
+                }
+                searchState = SearchState.BACKTRACKING;
                 backTrack();
             } else {
+                searchState = SearchState.EXPLORING;
                 visitNode(nextGraphNode);
             }
             count++;
         }
         System.out.printf("Depth: %d, traversals: %d\n", depth, count);
-        return currentTreeNode;
+        return foundLeafNodes;
     }
 
     private boolean isSearchComplete() {
@@ -97,11 +115,10 @@ public class StateTreeFactory {
         Node randomNode = graph.getRandomNode();
 
         long startTime = System.nanoTime();
-        TreeNode root = new StateTreeFactory(randomNode, 7).createStateTree();
-        System.out.println(root);
+        List<TreeNode> leafs = new StateTreeFactory(randomNode, new HashSet<Node>(), 5).createStateTree();
+        System.out.println(leafs);
         long endTime = System.nanoTime();
 
         System.out.println((double) (endTime - startTime) / (double) 1000000);
-
     }
 }
