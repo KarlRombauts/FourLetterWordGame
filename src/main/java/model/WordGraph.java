@@ -7,7 +7,6 @@ public class WordGraph {
 
     public void createGraph(Collection<String> dictionary) {
         createNodes(dictionary);
-        createLinks();
     }
 
     private void createNodes(Collection<String> dictionary) {
@@ -18,8 +17,9 @@ public class WordGraph {
     }
 
     private void createLinks() {
-        for (Node node1 : nodes.values()) {
-            for (Node node2 : nodes.values()) {
+        Collection<Node> nodeValues = nodes.values();
+        for (Node node1 : nodeValues) {
+            for (Node node2 : nodeValues) {
                 if (formsEdge(node1, node2)) {
                     node1.addLink(node2);
                 }
