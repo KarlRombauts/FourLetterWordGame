@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TreeNode {
     private String name;
@@ -43,5 +44,19 @@ public class TreeNode {
 
     public List<TreeNode> getChildren() {
         return children;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TreeNode treeNode = (TreeNode) o;
+        return name.equals(treeNode.name) &&
+                Objects.equals(parent, treeNode.parent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, parent);
     }
 }
