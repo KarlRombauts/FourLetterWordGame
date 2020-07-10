@@ -39,7 +39,7 @@ public class GameEngine {
         } while(!isValidTurn(word));
 
         visitNode(graph.findNode(word));
-        System.out.printf("%s played: %s", player.getName(), currentNode.getName());
+        System.out.printf("%s played: %s \n", player.getName(), currentNode.getName());
         setIndexToNextPlayer();
     }
 
