@@ -1,3 +1,4 @@
+import util.Dictionary;
 import model.Node;
 import model.TreeNode;
 import model.WordGraph;

@@ -1,5 +1,6 @@
 package view;
 
+import util.Dictionary;
 import model.GameEngine;
 import model.HumanPlayer;
 import model.Words;
