@@ -41,12 +41,14 @@ public class StateTreeFactory {
         currentPath.push(node);
 
         currentTreeNode = new TreeNode(node.getName(), currentTreeNode);
+        nextGraphNode = nextUnexploredConnection(currentGraphNode);
     }
 
     private void backTrack() {
         currentTreeNode = currentTreeNode.getParent();
         exploredConnectionsMap.get(currentPath.pop()).clear();
         currentGraphNode = currentPath.lastElement();
+        nextGraphNode = nextUnexploredConnection(currentGraphNode);
     }
 
     private Node nextUnexploredConnection(Node node) {
@@ -59,22 +61,23 @@ public class StateTreeFactory {
     }
 
     public boolean hasNext() {
+        while(shouldBackTrack() && !isSearchComplete()) {
+            backTrack();
+        }
         return !isSearchComplete();
     }
 
     public TreeNode next() {
+        if (isSearchComplete()) {
+            throw new NoSuchElementException("All of the leaf nodes have been discovered");
+        }
+
         while (true) {
             nextGraphNode = nextUnexploredConnection(currentGraphNode);
-            if (isSearchComplete()) {
-                throw new NoSuchElementException("All of the leaf nodes have been discovered");
-            }
 
             if (shouldBackTrack()) {
-                if (searchState == SearchState.EXPLORING) {
-                    return currentTreeNode;
-                }
                 searchState = SearchState.BACKTRACKING;
-                backTrack();
+                return currentTreeNode;
             } else {
                 searchState = SearchState.EXPLORING;
                 visitNode(nextGraphNode);
@@ -84,10 +87,7 @@ public class StateTreeFactory {
 
     public List<TreeNode> createStateTree() {
         int count = 0;
-        nextGraphNode = nextUnexploredConnection(currentGraphNode);
         while (true) {
-            nextGraphNode = nextUnexploredConnection(currentGraphNode);
-
             if (isSearchComplete()) {
                 break;
             }
@@ -103,6 +103,7 @@ public class StateTreeFactory {
             }
             count++;
         }
+
         System.out.printf("Depth: %d, traversals: %d\n", depth, count);
         return foundLeafNodes;
     }
@@ -117,16 +118,18 @@ public class StateTreeFactory {
 
     public static void main(String[] args) throws FileNotFoundException {
         WordGraph graph = new WordGraph();
-        graph.createGraph(Dictionary.load("src/main/java/dictionaries/common-four-letter.txt"));
+        graph.createGraph(Dictionary.load("src/main/java/dictionaries/test-case-2.txt"));
 
         long startTime = System.nanoTime();
         Set<Node> visitedNodes = new HashSet<>();
 
-        List<TreeNode> leafs = new StateTreeFactory(graph.getRandomNode(), visitedNodes, 3).createStateTree();
+        StateTreeFactory stateTreeFactory = new StateTreeFactory(graph.findNode("blip"), visitedNodes, 10);
         double highestProbability = 0;
         String bestWord = "";
 
-        for (TreeNode leaf : leafs) {
+        while (stateTreeFactory.hasNext()) {
+            TreeNode leaf = stateTreeFactory.next();
+            System.out.println(leaf.getName());
             StaticEvaluator staticEvaluator = new StaticEvaluator(graph).setIterations(100);
             double probability = staticEvaluator.evaluateProbability(leaf);
 
