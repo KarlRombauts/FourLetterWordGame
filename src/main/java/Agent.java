@@ -1,9 +1,9 @@
+import agent.RandomWalker;
 import model.Node;
 import model.Words;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 

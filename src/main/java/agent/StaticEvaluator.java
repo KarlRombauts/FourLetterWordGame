@@ -1,3 +1,5 @@
+package agent;
+
 import model.Node;
 import model.TreeNode;
 import model.WordGraph;
@@ -8,11 +10,12 @@ import java.util.Set;
 class StaticEvaluator {
     private TreeNode leaf;
     private WordGraph graph;
-    private RandomWalker randomWalker = new RandomWalker();
+    private RandomWalker randomWalker;
     private int iterations = 100;
 
-    public StaticEvaluator(WordGraph graph) {
+    public StaticEvaluator(WordGraph graph, RandomWalker randomWalker) {
         this.graph = graph;
+        this.randomWalker = randomWalker;
     }
 
     public StaticEvaluator setIterations(int iterations) {
@@ -21,13 +24,14 @@ class StaticEvaluator {
     }
 
     public double evaluateProbability(TreeNode leaf) {
+        randomWalker.setPreviouslyVisitedNodes(getVisitedNodes(leaf));
         Node graphNode = graph.findNode(leaf.getName());
         double wins = 0;
+
         for (int i = 0; i < iterations; i++) {
-            wins += evaluateWinLose(randomWalker
-                    .setPreviouslyVisitedNodes(getVisitedNodes(leaf))
-                    .walk(graphNode));
+            wins += evaluateWinLose(randomWalker.walk(graphNode));
         }
+
         return wins / (double) iterations;
     }
 

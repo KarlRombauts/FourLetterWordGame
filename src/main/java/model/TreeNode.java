@@ -1,19 +1,40 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TreeNode {
-    private String name;
     private TreeNode parent;
     private int numberOfChildren = 0;
+    private int depth;
     private double winLoseRatio;
+    private Node graphNode;
     private List<TreeNode> children = new ArrayList<>();
+    private Set<Node> exploredConnections = new HashSet<>();
 
-    public TreeNode(String name, TreeNode parent) {
-        this.name = name;
+    public TreeNode(Node graphNode, TreeNode parent) {
+        this.graphNode = graphNode;
         createParentRelationship(parent);
+        this.depth = isRoot() ? 1: (parent.getDepth() + 1);
+    }
+
+    public void addExploredConnection(Node node) {
+        exploredConnections.add(node);
+    }
+
+    public void clearExploredConnections() {
+        exploredConnections.clear();
+    }
+
+    public Set<Node> getExploredConnections() {
+        return exploredConnections;
+    }
+
+    public Node getGraphNode() {
+        return graphNode;
+    }
+
+    public boolean isUnexplored(Node node) {
+        return !exploredConnections.contains(node) && !pathContains(node);
     }
 
     public void setNumberOfChildren(int numberOfChildren) {
@@ -45,7 +66,7 @@ public class TreeNode {
     }
 
     public String getName() {
-        return name;
+        return graphNode.getName();
     }
 
     public TreeNode getParent() {
@@ -56,17 +77,40 @@ public class TreeNode {
         return children;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TreeNode treeNode = (TreeNode) o;
-        return name.equals(treeNode.name) &&
-                Objects.equals(parent, treeNode.parent);
+        return Objects.equals(parent, treeNode.parent) &&
+                graphNode.equals(treeNode.graphNode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, parent);
+        return Objects.hash(parent, graphNode);
+    }
+
+    public boolean pathContains(Node graphNode) {
+        TreeNode current = this;
+        while (current != null) {
+            if (current.getGraphNode() == graphNode) {
+                return true;
+            }
+            current = current.parent;
+        }
+        return false;
+    }
+    public boolean isRoot() {
+        return parent == null;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public boolean isFullyExplored() {
+        return numberOfChildren == exploredConnections.size();
     }
 }
