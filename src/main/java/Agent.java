@@ -11,7 +11,7 @@ public class Agent {
     public static void main(String[] args) throws IOException {
         List<Node> nodes = getNodes();
 
-        RandomWalk randomWalk = new RandomWalk(new HashSet<>());
+        RandomWalker randomWalk = new RandomWalker();
 
         Node currentNode = nodes.get(nodes.size() - 10);
         System.out.println("Current model.Node: " + currentNode.getName());

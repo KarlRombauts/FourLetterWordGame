@@ -1,15 +1,10 @@
 import model.Node;
 import model.TreeNode;
 import model.WordGraph;
-import model.Words;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 
-enum SearchState {
-    EXPLORING,
-    BACKTRACKING,
-}
 
 public class StateTreeFactory {
     private Node startNode;
@@ -23,7 +18,10 @@ public class StateTreeFactory {
     private SearchState searchState;
     private List<TreeNode> foundLeafNodes = new ArrayList<>();
 
-
+    enum SearchState {
+        EXPLORING,
+        BACKTRACKING,
+    }
 
     public StateTreeFactory(Node startNode, Set<Node> previouslyVisitedNodes, int depth) {
         this.startNode = startNode;
@@ -36,7 +34,7 @@ public class StateTreeFactory {
 
     private void visitNode(Node node) {
         exploredConnectionsMap.computeIfAbsent(node, k -> new HashSet<>());
-        if(currentPath.size() > 0) {
+        if (currentPath.size() > 0) {
             exploredConnectionsMap.get(currentGraphNode).add(node);
         }
         currentGraphNode = node;
@@ -58,6 +56,30 @@ public class StateTreeFactory {
                 return link;
         }
         return null;
+    }
+
+    public boolean hasNext() {
+        return !isSearchComplete();
+    }
+
+    public TreeNode next() {
+        while (true) {
+            nextGraphNode = nextUnexploredConnection(currentGraphNode);
+            if (isSearchComplete()) {
+                throw new NoSuchElementException("All of the leaf nodes have been discovered");
+            }
+
+            if (shouldBackTrack()) {
+                if (searchState == SearchState.EXPLORING) {
+                    return currentTreeNode;
+                }
+                searchState = SearchState.BACKTRACKING;
+                backTrack();
+            } else {
+                searchState = SearchState.EXPLORING;
+                visitNode(nextGraphNode);
+            }
+        }
     }
 
     public List<TreeNode> createStateTree() {
@@ -94,49 +116,26 @@ public class StateTreeFactory {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        // Simple test case
-        Node node1 = new Node("1");
-        Node node2 = new Node("2");
-        Node node3 = new Node("3");
-        Node node4 = new Node("4");
-        Node node5 = new Node("5");
-
-        node1.createTwoWayLink(node2);
-        node2.createTwoWayLink(node3);
-        node3.createTwoWayLink(node4);
-        node4.createTwoWayLink(node5);
-
-        node2.createTwoWayLink(node4);
-
-//        TreeNode root = new StateTreeFactory(node1, 5).createStateTree();
-
-        // Test case with real words
         WordGraph graph = new WordGraph();
         graph.createGraph(Dictionary.load("src/main/java/dictionaries/common-four-letter.txt"));
-        Node randomNode = graph.getRandomNode();
 
         long startTime = System.nanoTime();
-        List<TreeNode> leafs = new StateTreeFactory(randomNode, new HashSet<Node>(), 6).createStateTree();
+        Set<Node> visitedNodes = new HashSet<>();
+
+        List<TreeNode> leafs = new StateTreeFactory(graph.getRandomNode(), visitedNodes, 3).createStateTree();
         double highestProbability = 0;
         String bestWord = "";
 
-        for (TreeNode leaf: leafs) {
-            Set<Node> visitedNodes = new HashSet<>();
-            TreeNode currentNode = leaf;
+        for (TreeNode leaf : leafs) {
+            StaticEvaluator staticEvaluator = new StaticEvaluator(graph).setIterations(100);
+            double probability = staticEvaluator.evaluateProbability(leaf);
 
-            while (currentNode.getParent() != null) {
-                visitedNodes.add(graph.findNode(currentNode.getName()));
-                currentNode = currentNode.getParent();
-            }
-
-            double probability = new RandomWalk(visitedNodes).calculateWinLoseRatio(graph.findNode(leaf.getName()), 500);
+            System.out.println(leaf.getName() + ": " + probability);
 
             if (probability > highestProbability) {
                 highestProbability = probability;
                 bestWord = leaf.getName();
             }
-
-            System.out.println(leaf.getName() + ": " + probability);
         }
 
         System.out.println("BEST: " + bestWord + ", Probability: " + highestProbability);
@@ -145,3 +144,4 @@ public class StateTreeFactory {
         System.out.println((double) (endTime - startTime) / (double) 1000000);
     }
 }
+

@@ -2,19 +2,22 @@ import model.Node;
 
 import java.util.*;
 
-public class RandomWalk {
+public class RandomWalker {
     private Node currentNode;
+    private Set<Node> previouslyVisitedNodes = new HashSet<>();
     private Set<Node> visitedNodes = new HashSet<>();
 
-    public RandomWalk(Set<Node> previouslyVisitedNodes) {
-        visitedNodes.addAll(previouslyVisitedNodes);
+    public RandomWalker setPreviouslyVisitedNodes(Set<Node> nodes) {
+       previouslyVisitedNodes = nodes;
+       return this;
     }
 
     public double calculateWinLoseRatio(Node startingNode, int iterations) {
         int wins = 0;
         int losses = 0;
-        for (int i = 0; i < iterations ; i++) {
-           int length = walk(startingNode);
+
+        for (int i = 0; i < iterations; i++) {
+            int length = walk(startingNode);
             if ((length % 2 == 1)) {
                 wins++;
             } else {
@@ -31,29 +34,30 @@ public class RandomWalk {
         int walkLength = 0;
         boolean walking = true;
 
-        while(walking) {
+        while (walking) {
             visitedNodes.add(currentNode);
-//            System.out.println("Visiting node: " + currentNode.getName());
             List<Node> unvisitedNodes = getUnvisitedConnectedNodes();
 
             if (unvisitedNodes.size() == 0) {
                 walking = false;
             } else {
-                currentNode = unvisitedNodes.get(new Random().nextInt(unvisitedNodes.size()));
+                currentNode = getRandomNode(unvisitedNodes);
                 walkLength++;
             }
         }
 
-//        System.out.println("Walk length: " + walkLength + " " + ((walkLength % 2 == 0) ? "Lose": "Win"));
         return walkLength;
     }
 
+    private Node getRandomNode(List<Node> nodes) {
+        return nodes.get(new Random().nextInt(nodes.size()));
+    }
 
     public List<Node> getUnvisitedConnectedNodes() {
         List<Node> unvisitedNodes = new ArrayList<>();
 
-        for (Node node: currentNode.getLinks()) {
-            if (!visitedNodes.contains(node)) {
+        for (Node node : currentNode.getLinks()) {
+            if (!visitedNodes.contains(node) && !previouslyVisitedNodes.contains(node)) {
                 unvisitedNodes.add(node);
             }
         }
