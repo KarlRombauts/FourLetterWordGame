@@ -7,11 +7,21 @@ import java.util.Objects;
 public class TreeNode {
     private String name;
     private TreeNode parent;
+    private int numberOfChildren = 0;
+    private double winLoseRatio;
     private List<TreeNode> children = new ArrayList<>();
 
     public TreeNode(String name, TreeNode parent) {
         this.name = name;
         createParentRelationship(parent);
+    }
+
+    public void setNumberOfChildren(int numberOfChildren) {
+        this.numberOfChildren = numberOfChildren;
+    }
+
+    public void setWinLoseRatio(double winLoseRatio) {
+        this.winLoseRatio = winLoseRatio;
     }
 
     public void addChild(TreeNode child) {

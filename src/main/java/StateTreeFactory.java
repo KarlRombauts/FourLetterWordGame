@@ -5,6 +5,7 @@ import model.WordGraph;
 
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class StateTreeFactory {
@@ -42,6 +43,7 @@ public class StateTreeFactory {
         currentPath.push(node);
 
         currentTreeNode = new TreeNode(node.getName(), currentTreeNode);
+        currentTreeNode.setNumberOfChildren(getUnexploredConnections(node).size());
         nextGraphNode = nextUnexploredConnection(currentGraphNode);
     }
 
@@ -50,6 +52,16 @@ public class StateTreeFactory {
         exploredConnectionsMap.get(currentPath.pop()).clear();
         currentGraphNode = currentPath.lastElement();
         nextGraphNode = nextUnexploredConnection(currentGraphNode);
+    }
+
+    private List<Node> getUnexploredConnections(Node node) {
+        Set<Node> exploredConnections = exploredConnectionsMap.get(node);
+        ArrayList<Node> collect = node.getLinks().stream()
+                .filter(link -> !(exploredConnections.contains(link)
+                        || currentPath.contains(link)
+                        || previouslyVisitedNodes.contains(link)))
+                .collect(Collectors.toCollection(ArrayList::new));
+        return collect;
     }
 
     private Node nextUnexploredConnection(Node node) {
