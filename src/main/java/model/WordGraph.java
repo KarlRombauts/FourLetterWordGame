@@ -5,12 +5,12 @@ import java.util.*;
 public class WordGraph {
     private final Map<String, Node> nodes = new HashMap<>();
 
-    public void createGraph(String[] dictionary) {
+    public void createGraph(Collection<String> dictionary) {
         createNodes(dictionary);
         createLinks();
     }
 
-    private void createNodes(String[] dictionary) {
+    private void createNodes(Collection<String> dictionary) {
         for (String word : dictionary) {
             nodes.put(word, new Node(word));
         }

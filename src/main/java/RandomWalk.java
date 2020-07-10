@@ -6,6 +6,10 @@ public class RandomWalk {
     private Node currentNode;
     private Set<Node> visitedNodes = new HashSet<>();
 
+    public RandomWalk(Set<Node> previouslyVisitedNodes) {
+        visitedNodes.addAll(previouslyVisitedNodes);
+    }
+
     public double calculateWinLoseRatio(Node startingNode, int iterations) {
         int wins = 0;
         int losses = 0;

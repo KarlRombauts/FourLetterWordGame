@@ -13,7 +13,7 @@ public class GameEngine {
     private Set<Node> visitedNodes = new HashSet<>();
     private Node currentNode;
 
-    public GameEngine(String[] dictionary) {
+    public GameEngine(List<String> dictionary) {
         graph = new WordGraph();
         graph.createGraph(dictionary);
     }

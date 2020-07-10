@@ -3,14 +3,15 @@ import model.Words;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 
 public class Agent {
     public static void main(String[] args) throws IOException {
-        List<Node> nodes = getNodes(Words.fourLetterWords.length - 1);
+        List<Node> nodes = getNodes();
 
-        RandomWalk randomWalk = new RandomWalk();
+        RandomWalk randomWalk = new RandomWalk(new HashSet<>());
 
         Node currentNode = nodes.get(nodes.size() - 10);
         System.out.println("Current model.Node: " + currentNode.getName());
@@ -20,14 +21,11 @@ public class Agent {
     }
 
 
-    private static List<Node> getNodes(int number) {
-        // Get words from dictionary
-        String[] words = new String[number];
-        System.arraycopy(Words.fourLetterWords, 0, words, 0, words.length);
+    private static List<Node> getNodes() {
 
         // Create Nodes
         List<Node> nodes = new ArrayList<>();
-        for (String word : words) {
+        for (String word : Words.fourLetterWords) {
             nodes.add(new Node(word));
         }
 
