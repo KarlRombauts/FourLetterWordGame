@@ -3,6 +3,7 @@ import model.TreeNode;
 import model.WordGraph;
 import model.Words;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 enum SearchState {
@@ -92,7 +93,7 @@ public class StateTreeFactory {
         return nextGraphNode == null || currentPath.size() == depth;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         // Simple test case
         Node node1 = new Node("1");
         Node node2 = new Node("2");
@@ -111,12 +112,34 @@ public class StateTreeFactory {
 
         // Test case with real words
         WordGraph graph = new WordGraph();
-        graph.createGraph(Words.fourLetterWords);
+        graph.createGraph(Dictionary.load("src/main/java/dictionaries/common-four-letter.txt"));
         Node randomNode = graph.getRandomNode();
 
         long startTime = System.nanoTime();
-        List<TreeNode> leafs = new StateTreeFactory(randomNode, new HashSet<Node>(), 5).createStateTree();
-        System.out.println(leafs);
+        List<TreeNode> leafs = new StateTreeFactory(randomNode, new HashSet<Node>(), 6).createStateTree();
+        double highestProbability = 0;
+        String bestWord = "";
+
+        for (TreeNode leaf: leafs) {
+            Set<Node> visitedNodes = new HashSet<>();
+            TreeNode currentNode = leaf;
+
+            while (currentNode.getParent() != null) {
+                visitedNodes.add(graph.findNode(currentNode.getName()));
+                currentNode = currentNode.getParent();
+            }
+
+            double probability = new RandomWalk(visitedNodes).calculateWinLoseRatio(graph.findNode(leaf.getName()), 500);
+
+            if (probability > highestProbability) {
+                highestProbability = probability;
+                bestWord = leaf.getName();
+            }
+
+            System.out.println(leaf.getName() + ": " + probability);
+        }
+
+        System.out.println("BEST: " + bestWord + ", Probability: " + highestProbability);
         long endTime = System.nanoTime();
 
         System.out.println((double) (endTime - startTime) / (double) 1000000);
