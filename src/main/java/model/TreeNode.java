@@ -4,9 +4,10 @@ import java.util.*;
 
 public class TreeNode {
     private TreeNode parent;
-    private int numberOfChildren = 0;
+    private int numberOfChildNodes = 0;
+    private int numberOfChildNodesProcessed = 0;
     private int depth;
-    private double winLoseRatio;
+    private double winLoseRatio = -1;
     private Node graphNode;
     private List<TreeNode> children = new ArrayList<>();
     private Set<Node> exploredConnections = new HashSet<>();
@@ -37,8 +38,16 @@ public class TreeNode {
         return !exploredConnections.contains(node) && !pathContains(node);
     }
 
-    public void setNumberOfChildren(int numberOfChildren) {
-        this.numberOfChildren = numberOfChildren;
+    public void setNumberOfChildNodes(int numberOfChildNodes) {
+        this.numberOfChildNodes = numberOfChildNodes;
+    }
+
+    public void incrementProcessedChildNodes() {
+        this.numberOfChildNodesProcessed++;
+    }
+
+    public boolean hasUnprocessedChildNodes() {
+        return numberOfChildNodes - numberOfChildNodesProcessed > 0;
     }
 
     public void setWinLoseRatio(double winLoseRatio) {
@@ -111,6 +120,14 @@ public class TreeNode {
     }
 
     public boolean isFullyExplored() {
-        return numberOfChildren == exploredConnections.size();
+        return numberOfChildNodes == exploredConnections.size();
+    }
+
+    public double getWinLoseRatio() {
+        return winLoseRatio;
+    }
+
+    public int getNumberOfChildNodes() {
+        return numberOfChildNodes;
     }
 }

@@ -26,7 +26,7 @@ public class StateTreeGenerator {
         }
 
         currentTreeNode = new TreeNode(node, currentTreeNode);
-        currentTreeNode.setNumberOfChildren(getNumberOfConnectionsToExplore(node));
+        currentTreeNode.setNumberOfChildNodes(getNumberOfConnectionsToExplore(node));
     }
 
     private void backTrack() {

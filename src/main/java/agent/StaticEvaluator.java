@@ -4,7 +4,9 @@ import model.Node;
 import model.TreeNode;
 import model.WordGraph;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class StaticEvaluator {
@@ -24,14 +26,21 @@ class StaticEvaluator {
     }
 
     public double evaluateProbability(TreeNode leaf) {
-        randomWalker.setPreviouslyVisitedNodes(getVisitedNodes(leaf));
-        Node graphNode = graph.findNode(leaf.getName());
-        double wins = 0;
+        Set<Node> visitedNodes = getVisitedNodes(leaf);
+        List<Node> unvistedConnections = new ArrayList<>(leaf.getGraphNode().getLinks());
+        unvistedConnections.removeAll(visitedNodes);
 
+        if (leaf.getNumberOfChildNodes() == 0) {
+            return evaluateWinLose(visitedNodes.size() - 1);
+        }
+
+        randomWalker.setPreviouslyVisitedNodes(visitedNodes);
+        Node graphNode = leaf.getGraphNode();
+
+        double wins = 0;
         for (int i = 0; i < iterations; i++) {
             wins += evaluateWinLose(randomWalker.walk(graphNode));
         }
-
         return wins / (double) iterations;
     }
 
@@ -44,8 +53,8 @@ class StaticEvaluator {
         Set<Node> visitedNodes = new HashSet<>();
         TreeNode currentNode = leaf;
 
-        while (currentNode.getParent() != null) {
-            visitedNodes.add(graph.findNode(currentNode.getName()));
+        while (currentNode != null) {
+            visitedNodes.add(currentNode.getGraphNode());
             currentNode = currentNode.getParent();
         }
 
